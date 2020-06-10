@@ -1,0 +1,21 @@
+popen to write in streams
+
+
+https://stackoverflow.com/questions/37497556/multi-threaded-file-transfer-with-socket
+
+to do
+
+simple file transfer 
+directory listing
+mutliple file at same time 
+file upload
+optional login
+
+
+notes
+
+connection termination timer
+
+CreatefileA()
+Creates or opens a file or I/O device. 
+The most commonly used I/O devices are as follows: file, file stream, directory, physical disk, volume, console buffer, tape drive, communications resource, mailslot, and pipe. The function returns a handle that can be used to access the file or device for various types of I/O depending on the file or device and the flags and attributes specified
