@@ -12,16 +12,24 @@ int main(int argc, char const *argv[])
 {
     int server_fd, new_socket, valread;
     struct sockaddr_in address;
-    int opt = 1;
-    std::ifstream fopen("image.jpg", std::ios::binary);
-    if (fopen.is_open())
+    int opt = 1, file_size;
+
+    std::string header = "HTTP/1.1 200 OK\r\nContent-Type: image/jpeg\r\nContent-Disposition: attachment; filename=\" filename.jpg \"\r\nConnection: close\r\nContent-Length: 201368\r\n\r\n";
+    std::ifstream file("image.jpg", std::ios::binary);
+    if (file.is_open())
     {
-        fopen.seekg(0, std::ios::end);
-        std::cout << "hello" << fopen.tellg();
+        file.seekg(0, std::ios::end);
+        file_size = file.tellg();
+        file.seekg(0, std::ios::beg);
     }
+    std::string content((std::istreambuf_iterator<char>(file)),
+                        std::istreambuf_iterator<char>());
+    std::string response(header);
+    response.append(content);
+    file.close();
+
     int addrlen = sizeof(address);
     char buffer[1024] = {0};
-    const char *hello = "Hello from server";
     // Creating socket file descriptor
     if ((server_fd = socket(AF_INET, SOCK_STREAM, 0)) == 0)
     {
@@ -36,6 +44,7 @@ int main(int argc, char const *argv[])
         perror("setsockopt");
         exit(EXIT_FAILURE);
     }
+
     address.sin_family = AF_INET;
     address.sin_addr.s_addr = INADDR_ANY;
     address.sin_port = htons(PORT);
@@ -47,11 +56,13 @@ int main(int argc, char const *argv[])
         perror("bind failed");
         exit(EXIT_FAILURE);
     }
+
     if (listen(server_fd, 3) < 0)
     {
         perror("listen");
         exit(EXIT_FAILURE);
     }
+
     if ((new_socket = accept(server_fd, (struct sockaddr *)&address,
                              (socklen_t *)&addrlen)) < 0)
     {
@@ -60,7 +71,8 @@ int main(int argc, char const *argv[])
     }
     valread = recv(new_socket, buffer, 1024, 0);
     printf("%s\n", buffer);
-    write(new_socket, hello, strlen(hello));
+
+    write(new_socket, response.c_str(), response.length());
     printf("Hello message sent\n");
     return 0;
 }
