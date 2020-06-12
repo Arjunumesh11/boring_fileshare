@@ -6,7 +6,26 @@
 #include <string.h>
 #include <iostream>
 #include <fstream>
+#include <sstream>
 #define PORT 8080
+std::string get_contenttype(std::string filename)
+{
+    std::string type;
+    if (filename.substr(filename.find_last_of(".")) == ".jpg")
+        type = "image/jpeg";
+    return type;
+}
+
+std::string make_header(std::string filename)
+{
+    std::ostringstream header;
+    header << "HTTP/1.1 200 OK\r\n";
+    header << "Content-Type: " << get_contenttype(filename) << "\r\n";
+    header << "Content-Disposition: attachment; filename =\"" << filename << "\"\r\n";
+    header << "Connection: close\r\n";
+    header << "Content-Length: 201368\r\n\r\n";
+    return header.str();
+}
 
 int main(int argc, char const *argv[])
 {
@@ -14,7 +33,7 @@ int main(int argc, char const *argv[])
     struct sockaddr_in address;
     int opt = 1, file_size;
 
-    std::string header = "HTTP/1.1 200 OK\r\nContent-Type: image/jpeg\r\nContent-Disposition: attachment; filename=\" filename.jpg \"\r\nConnection: close\r\nContent-Length: 201368\r\n\r\n";
+    std::string header = make_header("image.jpg");
     std::ifstream file("image.jpg", std::ios::binary);
     if (file.is_open())
     {
