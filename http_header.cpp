@@ -21,13 +21,17 @@ std::string http_header::get_contenttype(std::string filename)
         type = "application/octet-stream";
     return type;
 }
-
+std::string http_header::get_filename(std::string filename)
+{
+    std::string result = filename.substr(filename.find_last_of("/") + 1);
+    return result;
+}
 std::string http_header::make_header(std::string filename, int file_size)
 {
     std::ostringstream header;
     header << "HTTP/1.1 200 OK\r\n";
     header << "Content-Type: " << http_header::get_contenttype(filename) << "\r\n";
-    header << "Content-Disposition: inline; filename =\"" << filename << "\"\r\n";
+    header << "Content-Disposition: inline; filename =\"" << http_header::get_filename(filename) << "\"\r\n";
     header << "Connection: keep-alive\r\n";
     header << "Transfer-Encoding: chunked\r\n";
     header << "\r\n";

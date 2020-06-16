@@ -13,56 +13,22 @@
 
 #define PORT 3000
 
-std::string get_contenttype(std::string filename)
-{
-    std::string type, extention;
-    extention = filename.substr(filename.find_last_of("."));
-    if (extention == ".jpg")
-        type = "image/jpeg";
-    else if (extention == ".png")
-        type = "image/png";
-    else if (extention == ".zip")
-        type = "application/zip";
-    else if (extention == ".txt")
-        type = "text/plain";
-    else if (extention == ".mp4")
-        type = "video/mp4";
-    else if (extention == ".mkv")
-        type = "video/mp4";
-    else
-        type = "application/octet-stream";
-    return type;
-}
-
-std::string make_header(std::string filename, int file_size)
-{
-    std::ostringstream header;
-    header << "HTTP/1.1 200 OK\r\n";
-    // header << "Content-Type: " << get_contenttype(filename) << "\r\n";
-    header << "Content-Type: image/jpeg;\r\n";
-    header << "Content-Disposition: attachment; filename =\"plain.jpg\"\r\n";
-    header << "Transfer-Encoding: chunked\r\n";
-    header << "\r\n";
-    // header << "Connection: keep-alive\r\n";
-    // header << "Content-Range: 1-1000\r\n\r\n";
-    // header << "Content-Length: 1000\r\n\r\n";
-    // header << "Content-Length: " << file_size << "\r\n\r\n";
-    return header.str();
-}
-std::string make_msg()
-{
-    std::ostringstream header;
-    header << "A\r\nhelloarjun\r\n";
-    return header.str();
-}
-
 int main(int argc, char const *argv[])
 {
     int server_fd, new_socket, valread;
     struct sockaddr_in address;
+    int addrlen = sizeof(address);
     int opt = 1, file_size;
+    char buffer_recv[1024] = {0};
+
     std::string file_name;
+    std::vector<char> content;
+    std::string header;
+    std::vector<char> buffer(1024);
+    std::streamsize s;
+
     file_name = "./test_input/image.jpg";
+
     std::ifstream file(file_name.c_str(), std::ios::binary);
     if (file.is_open())
     {
@@ -75,17 +41,7 @@ int main(int argc, char const *argv[])
         perror("file not found ");
         exit(0);
     }
-    // std::cout << file_size;
-    std::string header = http_header::make_header(file_name, file_size);
-    // std::string content((std::istreambuf_iterator<char>(file)),
-    //                     std::istreambuf_iterator<char>());
-    // std::string response(header);
-    // response.append(content);
-    // file.close();
-    // std::cout << content.length();
 
-    int addrlen = sizeof(address);
-    char buffer[1024] = {0};
     // Creating socket file descriptor
     if ((server_fd = socket(AF_INET, SOCK_STREAM, 0)) == 0)
     {
@@ -125,32 +81,26 @@ int main(int argc, char const *argv[])
         perror("accept");
         exit(EXIT_FAILURE);
     }
-    valread = recv(new_socket, buffer, 1024, 0);
-    printf("%s\n", buffer);
-    char *client_address = new char[100];
+    valread = recv(new_socket, buffer_recv, 1024, 0);
+    printf("%s\n", buffer_recv);
+
+    header = http_header::make_header(file_name, file_size);
 
     write(new_socket, header.c_str(), header.length());
-    std::string tst;
-    std::vector<char> content;
-    // char *buffer1 = new char[1024];
-    std::vector<char> buffer1(1024);
-    while (file.read(&buffer1[0], 1024))
+
+    while (file.read(&buffer[0], 1024))
     {
-        std::streamsize s = file.gcount();
-        content = chunk::make_chunk(buffer1, s);
-        std::cout << &content[0] << "|" << std::endl
-                  << "s = " << s << std::endl;
+        s = file.gcount();
+        content = chunk::make_chunk(buffer, s);
         write(new_socket, &content[0], content.size());
     }
-    std::streamsize s = file.gcount();
-    content = chunk::make_chunk(buffer1, s);
+    s = file.gcount();
+    content = chunk::make_chunk(buffer, s);
     if (!content.empty())
     {
-        std::cout << &content[0] << "|" << std::endl
-                  << "s =af " << s << std::endl;
         write(new_socket, &content[0], content.size());
     }
-    tst = chunk::END;
-    write(new_socket, tst.c_str(), tst.length());
+
+    write(new_socket, chunk::END.c_str(), chunk::END.length());
     return 0;
 }
