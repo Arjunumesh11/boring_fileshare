@@ -14,7 +14,7 @@
 #define SERVER_BACKLOG 10
 #define THREAD_POOL_SIZE 10
 
-int check(int status, std::string error) //function to check error
+void check(int status, std::string error) //function to check error
 {
     if (status == -1)
     {
@@ -68,7 +68,7 @@ void handle_connection(int new_socket)
 
 int main(int argc, char const *argv[])
 {
-    int server_fd, new_socket, valread;
+    int server_fd, new_socket;
     struct sockaddr_in address;
     int addrlen = sizeof(address);
     int opt = 1;
@@ -101,7 +101,6 @@ int main(int argc, char const *argv[])
                                    (socklen_t *)&addrlen)),
               "accept_failed");
 
-        valread = recv(new_socket, buffer_recv, 1024, 0);
         printf("%s\n", buffer_recv);
         T = std::thread(handle_connection, new_socket);
         T.detach();
