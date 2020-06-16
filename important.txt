@@ -1,2 +1,0 @@
-content-type :application/octet-stream
-content-Disposition:attachment; filename="filename.jpg"
