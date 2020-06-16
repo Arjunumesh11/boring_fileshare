@@ -9,51 +9,26 @@
 #include <fstream>
 #include <sstream>
 #include "chunkencoding.h"
+#include "http_header.h"
 
 #define PORT 3000
 #define BUFFER_SIZE 1024
-std::string get_contenttype(std::string filename)
-{
-    std::string type, extention;
-    extention = filename.substr(filename.find_last_of("."));
-    if (extention == ".jpg")
-        type = "image/jpeg";
-    else if (extention == ".png")
-        type = "image/png";
-    else if (extention == ".zip")
-        type = "application/zip";
-    else if (extention == ".txt")
-        type = "text/plain";
-    else if (extention == ".mp4")
-        type = "video/mp4";
-    else if (extention == ".mkv")
-        type = "video/mp4";
-    else
-        type = "application/octet-stream";
-    return type;
-}
-
-std::string make_header(std::string filename, int file_size)
-{
-    std::ostringstream header;
-    header << "HTTP/1.1 200 OK\r\n";
-    header << "Content-Type: " << get_contenttype(filename) << "\r\n";
-    header << "Content-Disposition: inline; filename =\"" << filename << "\"\r\n";
-    header << "Connection: keep-alive\r\n";
-    header << "Transfer-Encoding: chunked\r\n";
-    return header.str();
-}
 
 int main(int argc, char const *argv[])
 {
     int server_fd, new_socket, valread;
     struct sockaddr_in address;
+
+    int addrlen = sizeof(address);
+    char buffer_recv[1024] = {0};
     int opt = 1, file_size;
+
     std::string header;
     std::string file_name;
     std::vector<char> content;
     std::vector<char> buffer(BUFFER_SIZE);
-    file_name = "text.txt";
+
+    file_name = "./test_input/text.txt";
 
     std::ifstream file(file_name.c_str(), std::ios::binary);
     if (file.is_open())
@@ -67,9 +42,6 @@ int main(int argc, char const *argv[])
         perror("file not found");
         exit(0);
     }
-
-    int addrlen = sizeof(address);
-    char buffer_recv[1024] = {0};
     // Creating socket file descriptor
     if ((server_fd = socket(AF_INET, SOCK_STREAM, 0)) == 0)
     {
@@ -108,25 +80,28 @@ int main(int argc, char const *argv[])
         perror("accept");
         exit(EXIT_FAILURE);
     }
-    header = make_header(file_name, file_size);
+
+    header = http_header::make_header(file_name, file_size);
     valread = recv(new_socket, buffer_recv, 1024, 0);
     printf("%s\n", buffer_recv);
-    char *client_address = new char[100];
 
     write(new_socket, header.c_str(), header.length());
 
+    std::streamsize s;
     while (file.read(&buffer[0], 1024))
     {
-        std::streamsize s = file.gcount();
+        s = file.gcount();
         content = chunk::make_chunk(buffer, s);
         write(new_socket, &content[0], content.size());
     }
-    std::streamsize s = file.gcount();
+
+    s = file.gcount();
     content = chunk::make_chunk(buffer, s);
     if (!content.empty())
     {
         write(new_socket, &content[0], content.size());
     }
+
     write(new_socket, chunk::END.c_str(), chunk::END.length());
     return 0;
 }
