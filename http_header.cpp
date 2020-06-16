@@ -30,5 +30,6 @@ std::string http_header::make_header(std::string filename, int file_size)
     header << "Content-Disposition: inline; filename =\"" << filename << "\"\r\n";
     header << "Connection: keep-alive\r\n";
     header << "Transfer-Encoding: chunked\r\n";
+    header << "\r\n";
     return header.str();
 }
