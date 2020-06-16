@@ -5,11 +5,15 @@
 #include <arpa/inet.h>
 #include <netinet/in.h>
 #include <fstream>
+#include <thread>
 #include <errno.h>
 #include "chunkencoding.h"
 #include "http_header.h"
 
 #define PORT 3000
+#define SERVER_BACKLOG 10
+#define THREAD_POOL_SIZE 10
+
 int check(int status, std::string error) //function to check error
 {
     if (status == -1)
@@ -69,6 +73,7 @@ int main(int argc, char const *argv[])
     int addrlen = sizeof(address);
     int opt = 1;
     char buffer_recv[1024] = {0};
+    std::thread T;
 
     // Creating socket file descriptor
     check((server_fd = socket(AF_INET, SOCK_STREAM, 0)), "Soket_failed");
@@ -87,13 +92,19 @@ int main(int argc, char const *argv[])
                sizeof(address)),
           "Bind_failed");
 
-    check(listen(server_fd, 3), "Listen_failed");
-    check((new_socket = accept(server_fd, (struct sockaddr *)&address,
-                               (socklen_t *)&addrlen)),
-          "accept_failed");
+    check(listen(server_fd, SERVER_BACKLOG), "Listen_failed");
 
-    valread = recv(new_socket, buffer_recv, 1024, 0);
-    printf("%s\n", buffer_recv);
-    handle_connection(new_socket);
+    while (true)
+    {
+        check((new_socket = accept(server_fd, (struct sockaddr *)&address,
+
+                                   (socklen_t *)&addrlen)),
+              "accept_failed");
+
+        valread = recv(new_socket, buffer_recv, 1024, 0);
+        printf("%s\n", buffer_recv);
+        T = std::thread(handle_connection, new_socket);
+        T.detach();
+    }
     return 0;
 }
