@@ -5,16 +5,21 @@
 #include <dirent.h>
 #include <fnmatch.h>
 #include <string>
+#include <sys/stat.h>
+#include <sys/types.h>
 #include <list>
 #include <unordered_map>
+
+struct stat sb;
 namespace file_handler
 {
     class file
     {
+    public:
         //create directory
         //      @param : std::string root_folder
         //      @return :-1 if not successfull
-        bool create_directory(std::string root_folder);
+        int create_directory(std::string root_folder);
 
         //get file_list
         //     @param : none
@@ -27,7 +32,9 @@ namespace file_handler
         std::string get_file(std::string filename);
 
     private:
-        std::unordered_map<std::string, std::string> file_list;
+        static int parser(const char *fpath, const struct stat *sb, int typeflag);
+        static std::unordered_map<std::string, std::string> file_list;
+        int a;
     };
 } // namespace file_handler
 
