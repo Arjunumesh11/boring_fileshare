@@ -6,7 +6,7 @@ to do
 
 simple file transfer 
 directory listing
-    data structure hold filename:
+    data structure hold filename: hashtable
         {
             needs:
                 {
