@@ -1,5 +1,4 @@
-test*
-debug*
-*.out
-*.o
-server
+build
+bin
+test
+test_input

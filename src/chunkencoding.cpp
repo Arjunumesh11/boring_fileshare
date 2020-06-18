@@ -1,6 +1,5 @@
 #include "chunkencoding.h"
 using namespace chunk;
-
 std::vector<char> chunk::make_chunk(std::vector<char> chunk, int size)
 {
     std::ostringstream temp;

@@ -1,18 +1,20 @@
 CXXFLAGS=-g -Wall
 CXX=g++
 LDFLAGS=-pthread
+SRCDIR=./src
+BUILDDIR=./build
+TARGET=./bin/server
+INC= -I include
 
-server: main.o chunkencoding.o http_header.o
-	$(CXX) $(LDFLAGS) main.o chunkencoding.o http_header.o -o server
+SRCEXT=cpp
+SOURCES=$(shell find $(SRCDIR) -type f -name *.$(SRCEXT))
+OBJECTS=$(patsubst $(SRCDIR)/%,$(BUILDDIR)/%,$(SOURCES:.$(SRCEXT)=.o))
 
-main.o: main.cpp
-	$(CXX) $(CXXFLAGS) -c main.cpp
+$(TARGET): $(OBJECTS)
+	$(CXX) $(LDFLAGS) $^ -o $(TARGET)
 
-chunkencoding.o: chunkencoding.cpp chunkencoding.h
-	$(CXX) $(CXXFLAGS) -c chunkencoding.cpp
-
-http_header.o: http_header.cpp http_header.h
-	$(CXX) $(CXXFLAGS) -c http_header.cpp
-
+$(BUILDDIR)/%.o: $(SRCDIR)/%.$(SRCEXT)
+	@mkdir -p $(BUILDDIR)
+	$(CXX) $(CXXFLAGS) $(INC) -c -o $@ $<
 clean:
-	rm *.o server
+	rm -r $(BUILDDIR) $(TARGET)
