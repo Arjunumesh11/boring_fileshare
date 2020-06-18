@@ -1,13 +1,14 @@
 #ifndef _file_handler
 #define _file_handler
 
+#include <iostream>
 #include <ftw.h>
 #include <dirent.h>
 #include <fnmatch.h>
 #include <string>
 #include <sys/stat.h>
 #include <sys/types.h>
-#include <list>
+#include <vector>
 #include <unordered_map>
 
 struct stat sb;
@@ -24,7 +25,7 @@ namespace file_handler
         //get file_list
         //     @param : none
         //     @return : std::list<string> filelist
-        std::list<std::string> get_filelist();
+        std::vector<std::string> get_filelist();
 
         //get file name,path
         //    @param : std::string filename
@@ -33,7 +34,8 @@ namespace file_handler
 
     private:
         static int parser(const char *fpath, const struct stat *sb, int typeflag);
-        static std::unordered_map<std::string, std::string> file_list;
+        static std::unordered_map<std::string, std::string> _file_list;
+        std::vector<std::string> file_list;
         int a;
     };
 } // namespace file_handler
