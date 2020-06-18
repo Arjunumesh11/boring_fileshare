@@ -1,7 +1,6 @@
 #ifndef _file_handler
 #define _file_handler
 
-#include <iostream>
 #include <ftw.h>
 #include <dirent.h>
 #include <fnmatch.h>
