@@ -17,10 +17,9 @@ directory listing
         }
 
 mutliple file at same time 
-file upload
-optional login
 
-
-notes
-
-connection termination timer
+httprequest handler
+	{
+		path analyser regular expression parameter identification
+	}
+serving static page
