@@ -40,7 +40,9 @@ Returns the filepath of a specific <filename>
 std::map<std::string, std::string> get(std::string path, std::string url);
 ```
 #### example
-get("/video/:name/:filetype","/video/dance/mp4")
+```
+get(" /video/:name/:filetype " , " /video/dance/mp4 ")
+```
 ```
 returns map
 video : dance
