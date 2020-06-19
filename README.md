@@ -5,9 +5,9 @@ A simple video streaming service implemented from scratch using c++
 Transfer encoding used Chunked
 ### Methods ###
 ```
-chunk::make_chunk(std::string data,int size)
+std::vector<char>  chunk::make_chunk(std::string data,int size)
 ```
-std::vector<char> create chunks specified by http standard
+create chunks specified by http standard
 ```
 5\r\n
 chunk\r\n
