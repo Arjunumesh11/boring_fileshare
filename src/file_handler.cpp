@@ -11,6 +11,16 @@ int file_handler::file::create_directory(std::string root_folder)
     return 0;
 }
 
+file_handler::file::file(std::string root_folder)
+{
+    if (stat(root_folder.c_str(), &sb) == -1)
+    {
+        fprintf(stderr, "NO DIRECTOR FOUND file() : %s\n", std::strerror(errno));
+        exit(EXIT_FAILURE);
+    }
+    ftw(root_folder.c_str(), parser, 16);
+}
+
 int file_handler::file::parser(const char *fpath, const struct stat *sb, int typeflag)
 {
     if (typeflag == FTW_F)

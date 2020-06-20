@@ -1,6 +1,8 @@
 #ifndef _file_handler
 #define _file_handler
 
+#include <errno.h>
+#include <cstring>
 #include <ftw.h>
 #include <dirent.h>
 #include <fnmatch.h>
@@ -16,6 +18,10 @@ namespace file_handler
     class file
     {
     public:
+        //intialise wiht root directory
+        //@param : std::string root_folder
+        file(std::string root_folder);
+
         //create directory
         //      @param : std::string root_folder
         //      @return :-1 if not successfull
