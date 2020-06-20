@@ -11,13 +11,15 @@
 #include <sys/types.h>
 #include <vector>
 #include <unordered_map>
+extern struct stat sb;
 
-struct stat sb;
 namespace file_handler
 {
     class file
     {
     public:
+        file(){};
+
         //intialise wiht root directory
         //@param : std::string root_folder
         file(std::string root_folder);

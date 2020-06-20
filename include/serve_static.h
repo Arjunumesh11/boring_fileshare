@@ -12,8 +12,11 @@ namespace serve_static
     {
 
         std::vector<std::string> file_paths;
+        file_handler::file _root_folder;
 
     public:
+        servestatic() {}
+
         //int static(std::string folder)
         //@param : folder
         servestatic(std::string folder);

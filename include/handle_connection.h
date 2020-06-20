@@ -3,6 +3,7 @@
 
 #include <string>
 #include <vector>
+#include <errno.h>
 
 namespace handle_connection
 {

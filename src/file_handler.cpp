@@ -1,6 +1,6 @@
 #include "file_handler.h"
 using namespace file_handler;
-
+struct stat sb;
 std::unordered_map<std::string, std::string> file_handler::file::_file_list;
 
 int file_handler::file::create_directory(std::string root_folder)
