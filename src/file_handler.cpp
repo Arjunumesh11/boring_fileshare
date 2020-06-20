@@ -24,15 +24,28 @@ int file_handler::file::parser(const char *fpath, const struct stat *sb, int typ
 
 std::vector<std::string> file_handler::file::get_filelist()
 {
-    if (file_list.empty())
+    if (file_handler::file::file_list.empty())
     {
         for (auto kv : file_handler::file::_file_list)
         {
-            file_list.push_back(kv.first);
+            file_handler::file::file_list.push_back(kv.first);
         }
     }
 
-    return file_list;
+    return file_handler::file::file_list;
+}
+
+std::vector<std::string> file_handler::file::get_paths()
+{
+    if (file_handler::file::file_paths.empty())
+    {
+        for (auto kv : file_handler::file::_file_list)
+        {
+            file_handler::file::file_paths.push_back(kv.second);
+        }
+    }
+
+    return file_handler::file::file_paths;
 }
 
 std::string file_handler::file::get_file(std::string filename)

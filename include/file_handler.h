@@ -31,10 +31,15 @@ namespace file_handler
         //    @return : std::string filepath
         std::string get_file(std::string filename);
 
+        //get path list
+        //    @return : std::string filepaths
+        std::vector<std::string> get_paths();
+
     private:
         static int parser(const char *fpath, const struct stat *sb, int typeflag);
         static std::unordered_map<std::string, std::string> _file_list;
         std::vector<std::string> file_list;
+        std::vector<std::string> file_paths;
         int a;
     };
 } // namespace file_handler
