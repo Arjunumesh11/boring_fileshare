@@ -109,8 +109,8 @@ int main(int argc, char const *argv[])
               "accept_failed");
         read(new_socket, buffer_recv, 1024);
         printf("%s\n", buffer_recv);
-        T = std::thread(handle_connection, new_socket);
-        T.detach();
+        // T = std::thread(handle_connection, new_socket);
+        // T.detach();
     }
     return 0;
 }
