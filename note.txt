@@ -23,3 +23,7 @@ httprequest handler
 		path analyser regular expression parameter identification
 	}
 serving static page
+    {
+        if index.hmtl or / server index.html
+        serve all files in the folder
+    }

@@ -7,6 +7,7 @@
 #include <fstream>
 #include <thread>
 #include <errno.h>
+#include <cstring>
 #include "http_header.h"
 #include "chunkencoding.h"
 
@@ -18,13 +19,13 @@ void check(int status, std::string error) //function to check error
 {
     if (status == -1)
     {
-        fprintf(stderr, "%s : %i\n", error.c_str(), errno);
+        fprintf(stderr, "%s : %s\n", error.c_str(), std::strerror(errno));
         exit(EXIT_FAILURE);
     }
 }
 void handle_connection(int new_socket)
 {
-    int file_size;
+    int file_size, flag = 1;
     std::vector<char> content;
     std::string header;
     std::string file_name;
@@ -48,22 +49,28 @@ void handle_connection(int new_socket)
 
     header = http_header::make_header(file_name, file_size);
 
-    write(new_socket, header.c_str(), header.length());
+    send(new_socket, header.c_str(), header.length(), MSG_NOSIGNAL);
 
-    while (file.read(&buffer[0], 1024))
+    while (file.read(&buffer[0], 1024) && flag)
     {
         s = file.gcount();
         content = chunk::make_chunk(buffer, s);
-        write(new_socket, &content[0], content.size());
+        // check(send(new_socket, &content[0], content.size(), MSG_NOSIGNAL), "Write_error");
+        if (send(new_socket, &content[0], content.size(), MSG_NOSIGNAL) < 0)
+        {
+            flag = 0;
+            return;
+        }
     }
     s = file.gcount();
     content = chunk::make_chunk(buffer, s);
     if (!content.empty())
     {
-        write(new_socket, &content[0], content.size());
+        send(new_socket, &content[0], content.size(), MSG_NOSIGNAL);
     }
 
-    write(new_socket, chunk::END.c_str(), chunk::END.length());
+    send(new_socket, chunk::END.c_str(), chunk::END.length(), MSG_NOSIGNAL);
+    printf("\ntermintead\n");
 }
 
 int main(int argc, char const *argv[])
@@ -100,7 +107,7 @@ int main(int argc, char const *argv[])
 
                                    (socklen_t *)&addrlen)),
               "accept_failed");
-
+        read(new_socket, buffer_recv, 1024);
         printf("%s\n", buffer_recv);
         T = std::thread(handle_connection, new_socket);
         T.detach();
