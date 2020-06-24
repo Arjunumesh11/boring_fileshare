@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include <cstring>
+#include <algorithm>
 #include "file_handler.h"
 
 namespace serve_static
@@ -26,7 +27,7 @@ namespace serve_static
         //@return : -1 if not successfull
         int create_directory(std::string folder);
 
-        int serve(std::string response, int new_socket);
+        int serve(std::string path, int new_socket);
     };
 
 } // namespace serve_static

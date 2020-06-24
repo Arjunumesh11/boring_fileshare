@@ -21,7 +21,10 @@ int serve_static::servestatic::create_directory(std::string folder)
     return 0;
 }
 
-int serve_static::servestatic::serve(std::string response, int new_socket)
+int serve_static::servestatic::serve(std::string path, int new_socket)
 {
-    return 0;
+    std::vector<std::string>::iterator it;
+    it = std::find(serve_static::servestatic::file_paths.begin(), serve_static::servestatic::file_paths.end(), path);
+    if (it == serve_static::servestatic::file_paths.end())
+        return 0;
 }

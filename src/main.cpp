@@ -32,7 +32,7 @@ void handle_connection(int new_socket)
     std::vector<char> buffer(1024);
     std::streamsize s;
 
-    file_name = "./test_input/video.mp4";
+    file_name = "/test_input/video.mp4";
 
     std::ifstream file(file_name.c_str(), std::ios::binary);
     if (file.is_open())
@@ -109,8 +109,8 @@ int main(int argc, char const *argv[])
               "accept_failed");
         read(new_socket, buffer_recv, 1024);
         printf("%s\n", buffer_recv);
-        // T = std::thread(handle_connection, new_socket);
-        // T.detach();
+        T = std::thread(handle_connection, new_socket);
+        T.detach();
     }
     return 0;
 }
