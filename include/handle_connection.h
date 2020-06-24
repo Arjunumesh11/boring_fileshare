@@ -21,7 +21,6 @@ namespace handle_connection
         //@param : int socket
         void call(std::string response, int new_socket);
     };
-
 } // namespace handle_connection
 
 #endif

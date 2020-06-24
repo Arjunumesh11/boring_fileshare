@@ -1,6 +1,15 @@
 #include "serve_static.h"
 using namespace serve_static;
 
+void check(int status, std::string error) //function to check error
+{
+    if (status == -1)
+    {
+        fprintf(stderr, "%s : %s\n", error.c_str(), std::strerror(errno));
+        exit(EXIT_FAILURE);
+    }
+}
+
 serve_static::servestatic::servestatic(std::string folder)
 {
     if (serve_static::servestatic::_root_folder.create_directory(folder) < 0)
