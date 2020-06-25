@@ -122,6 +122,7 @@ int main(int argc, char const *argv[])
         T = std::thread([&server, &public_folder](std::string request, int new_socket) {
             server.parse(request);
             check(public_folder.serve(server.getpath(), new_socket), "invalid directory");
+            close(new_socket);
         },
                         request, new_socket);
         // read(new_socket, buffer_recv, 1024);
