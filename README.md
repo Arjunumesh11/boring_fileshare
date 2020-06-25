@@ -48,3 +48,15 @@ returns map
 video : dance
 filetype : mp4
 ```
+## Serve static files
+### Methods
+```
+int serve_static::servestatic::serve(std::string path, int new_socket)
+
+serve_static::servestatic::servestatic(std::string folder)
+```
+### example
+```
+servestatic server("./public");
+server.serve("/index.html",sock_fd);
+```
