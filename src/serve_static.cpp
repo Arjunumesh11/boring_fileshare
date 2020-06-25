@@ -30,7 +30,10 @@ int serve_static::servestatic::serve(std::string path, int new_socket)
     std::vector<std::string>::iterator it;
     it = std::find(serve_static::servestatic::file_paths.begin(), serve_static::servestatic::file_paths.end(), path);
     if (it == serve_static::servestatic::file_paths.end())
+    {
         return -1;
+    }
     check(chunk::send_chunk(new_socket, path), "send_chunk error");
+    close(new_socket);
     return 0;
 }

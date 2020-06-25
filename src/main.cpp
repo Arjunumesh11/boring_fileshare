@@ -11,6 +11,7 @@
 #include "http_header.h"
 #include "chunkencoding.h"
 #include "serve_static.h"
+#include "handle_connection.h"
 #include "http_parser.h"
 #include <iostream>
 
@@ -88,9 +89,12 @@ int main(int argc, char const *argv[])
     std::thread T;
 
     http_parser::http server;
+    handle_connection::handleconnection connections;
     serve_static::servestatic public_folder;
+    serve_static::servestatic test_folder;
 
     check(public_folder.create_directory("./public"), "create public folder");
+    check(test_folder.create_directory("./test_input"), "create test folder");
     // Creating socket file descriptor
     check((server_fd = socket(AF_INET, SOCK_STREAM, 0)), "Soket_failed");
 
@@ -109,7 +113,6 @@ int main(int argc, char const *argv[])
           "Bind_failed");
 
     check(listen(server_fd, SERVER_BACKLOG), "Listen_failed");
-
     while (true)
     {
         check((new_socket = accept(server_fd, (struct sockaddr *)&address,
@@ -119,10 +122,16 @@ int main(int argc, char const *argv[])
         read(new_socket, buffer_recv, 1024);
         request = buffer_recv;
         fprintf(stderr, "%s", request.c_str());
-        T = std::thread([&server, &public_folder](std::string request, int new_socket) {
+        T = std::thread([&server, &public_folder, &test_folder](std::string request, int new_socket) {
             server.parse(request);
-            check(public_folder.serve(server.getpath(), new_socket), "invalid directory");
+            if (public_folder.serve(server.getpath(), new_socket) < 0)
+                if (test_folder.serve(server.getpath(), new_socket) < 0)
+                {
+                    close(new_socket);
+                    return -1;
+                }
             close(new_socket);
+            return 0;
         },
                         request, new_socket);
         // read(new_socket, buffer_recv, 1024);

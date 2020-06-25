@@ -1,6 +1,8 @@
 #ifndef _serve_static
 #define _serve_static
 
+#include <unistd.h>
+#include <stdio.h>
 #include <string>
 #include <vector>
 #include <cstring>
