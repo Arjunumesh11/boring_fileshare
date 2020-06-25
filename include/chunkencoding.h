@@ -9,6 +9,8 @@
 #include <errno.h>
 #include <cstring>
 #include <iomanip>
+
+#define BUFFER_SIZE 1024
 namespace chunk
 {
     const std::string CLRF = "\r\n";
@@ -19,10 +21,10 @@ namespace chunk
     //return : chunked data
     std::vector<char> make_chunk(std::vector<char> chunk, int size = -1);
     //send chunk
-    //@param sockek
-    //@param file name
+    //@param socket
+    //@param file path
     //return -1 if failed
-    int send_chunk(int new_socket, std::string file_name);
+    int send_chunk(int new_socket, std::string file_path);
 } // namespace chunk
 
 #endif

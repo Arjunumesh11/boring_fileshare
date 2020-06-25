@@ -10,7 +10,7 @@ void handle_connection::handleconnection::call(std::string response, int new_soc
 {
     for (auto c : handle_connection::handleconnection::funclist)
     {
-        if (c(response, new_socket))
+        if (c(response, new_socket) == 0)
             return;
     }
 }

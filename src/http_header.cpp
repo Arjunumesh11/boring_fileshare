@@ -7,6 +7,10 @@ std::string http_header::get_contenttype(std::string filename)
     extention = filename.substr(filename.find_last_of("."));
     if (extention == ".jpg")
         type = "image/jpeg";
+    else if (extention == ".html")
+        type = "text/html";
+    else if (extention == ".js")
+        type = "application/javascipt";
     else if (extention == ".png")
         type = "image/png";
     else if (extention == ".zip")

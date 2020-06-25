@@ -1,5 +1,8 @@
 #include "chunkencoding.h"
+void check(int status, std::string error); //function to check error
+
 using namespace chunk;
+
 std::vector<char> chunk::make_chunk(std::vector<char> chunk, int size)
 {
     std::ostringstream temp;
@@ -16,16 +19,15 @@ std::vector<char> chunk::make_chunk(std::vector<char> chunk, int size)
     return result;
 }
 
-int chunk::send_chunk(int new_socket, std::string file_name)
+int chunk::send_chunk(int new_socket, std::string file_path)
 {
     int file_size, flag = 1;
     std::vector<char> content;
     std::string header;
-    std::string file_name;
-    std::vector<char> buffer(1024);
+    std::vector<char> buffer(BUFFER_SIZE);
     std::streamsize s;
 
-    std::ifstream file(file_name.c_str(), std::ios::binary);
+    std::ifstream file(file_path.c_str(), std::ios::binary);
     if (file.is_open())
     {
         file.seekg(0, std::ios::end);
@@ -38,11 +40,11 @@ int chunk::send_chunk(int new_socket, std::string file_name)
         return -1;
     }
 
-    header = http_header::make_header(file_name, file_size);
+    header = http_header::make_header(file_path, file_size);
 
     send(new_socket, header.c_str(), header.length(), MSG_NOSIGNAL);
 
-    while (file.read(&buffer[0], 1024) && flag)
+    while (file.read(&buffer[0], BUFFER_SIZE) && flag)
     {
         s = file.gcount();
         content = chunk::make_chunk(buffer, s);
@@ -61,6 +63,6 @@ int chunk::send_chunk(int new_socket, std::string file_name)
     }
 
     send(new_socket, chunk::END.c_str(), chunk::END.length(), MSG_NOSIGNAL);
-    printf("\ntermintead\n");
+    fprintf(stderr, "\nterminated\n");
     return 0;
 }

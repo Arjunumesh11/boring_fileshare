@@ -10,6 +10,9 @@
 #include <cstring>
 #include "http_header.h"
 #include "chunkencoding.h"
+#include "serve_static.h"
+#include "http_parser.h"
+#include <iostream>
 
 #define PORT 3000
 #define SERVER_BACKLOG 10
@@ -23,7 +26,8 @@ void check(int status, std::string error) //function to check error
         exit(EXIT_FAILURE);
     }
 }
-void handle_connection(int new_socket)
+
+void send_video(int new_socket)
 {
     int file_size, flag = 1;
     std::vector<char> content;
@@ -32,7 +36,7 @@ void handle_connection(int new_socket)
     std::vector<char> buffer(1024);
     std::streamsize s;
 
-    file_name = "/test_input/video.mp4";
+    file_name = "./test_input/video.mp4";
 
     std::ifstream file(file_name.c_str(), std::ios::binary);
     if (file.is_open())
@@ -70,18 +74,23 @@ void handle_connection(int new_socket)
     }
 
     send(new_socket, chunk::END.c_str(), chunk::END.length(), MSG_NOSIGNAL);
-    printf("\ntermintead\n");
+    fprintf(stderr, "\nterminated\n");
 }
 
 int main(int argc, char const *argv[])
 {
     int server_fd, new_socket;
+    std::string request;
     struct sockaddr_in address;
     int addrlen = sizeof(address);
     int opt = 1;
-    char buffer_recv[1024] = {0};
+    char buffer_recv[BUFFER_SIZE] = {0};
     std::thread T;
 
+    http_parser::http server;
+    serve_static::servestatic public_folder;
+
+    check(public_folder.create_directory("./public"), "create public folder");
     // Creating socket file descriptor
     check((server_fd = socket(AF_INET, SOCK_STREAM, 0)), "Soket_failed");
 
@@ -108,8 +117,16 @@ int main(int argc, char const *argv[])
                                    (socklen_t *)&addrlen)),
               "accept_failed");
         read(new_socket, buffer_recv, 1024);
-        printf("%s\n", buffer_recv);
-        T = std::thread(handle_connection, new_socket);
+        request = buffer_recv;
+        fprintf(stderr, "%s", request.c_str());
+        T = std::thread([&server, &public_folder](std::string request, int new_socket) {
+            server.parse(request);
+            check(public_folder.serve(server.getpath(), new_socket), "invalid directory");
+        },
+                        request, new_socket);
+        // read(new_socket, buffer_recv, 1024);
+        // std::cout << server.getpath();
+        // T = std::thread(send_video, new_socket);
         T.detach();
     }
     return 0;
