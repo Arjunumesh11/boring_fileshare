@@ -28,56 +28,6 @@ void check(int status, std::string error) //function to check error
     }
 }
 
-void send_video(int new_socket)
-{
-    int file_size, flag = 1;
-    std::vector<char> content;
-    std::string header;
-    std::string file_name;
-    std::vector<char> buffer(1024);
-    std::streamsize s;
-
-    file_name = "./test_input/video.mp4";
-
-    std::ifstream file(file_name.c_str(), std::ios::binary);
-    if (file.is_open())
-    {
-        file.seekg(0, std::ios::end);
-        file_size = file.tellg();
-        file.seekg(0, std::ios::beg);
-    }
-    else
-    {
-        perror("file not found ");
-        exit(0);
-    }
-
-    header = http_header::make_header(file_name, file_size);
-
-    send(new_socket, header.c_str(), header.length(), MSG_NOSIGNAL);
-
-    while (file.read(&buffer[0], 1024) && flag)
-    {
-        s = file.gcount();
-        content = chunk::make_chunk(buffer, s);
-        // check(send(new_socket, &content[0], content.size(), MSG_NOSIGNAL), "Write_error");
-        if (send(new_socket, &content[0], content.size(), MSG_NOSIGNAL) < 0)
-        {
-            flag = 0;
-            return;
-        }
-    }
-    s = file.gcount();
-    content = chunk::make_chunk(buffer, s);
-    if (!content.empty())
-    {
-        send(new_socket, &content[0], content.size(), MSG_NOSIGNAL);
-    }
-
-    send(new_socket, chunk::END.c_str(), chunk::END.length(), MSG_NOSIGNAL);
-    fprintf(stderr, "\nterminated\n");
-}
-
 int main(int argc, char const *argv[])
 {
     int server_fd, new_socket;
