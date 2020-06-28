@@ -8,6 +8,7 @@
 #include <thread>
 #include <errno.h>
 #include <cstring>
+#include "html_template.h"
 #include "http_header.h"
 #include "chunkencoding.h"
 #include "serve_static.h"
@@ -38,11 +39,25 @@ int main(int argc, char const *argv[])
     char buffer_recv[BUFFER_SIZE] = {0};
     std::thread T;
 
+    html_template::html_page index_page;
     http_parser::http server;
     handle_connection::handleconnection connections;
     serve_static::servestatic public_folder;
     serve_static::servestatic test_folder;
+    file_handler::file video_folder("./test_input");
+    std::vector<std::string> path = video_folder.get_paths();
 
+    std::ofstream index_public("./public/index.html");
+
+    std::vector<std::string> paths = video_folder.get_filelist();
+    index_page.init_page();
+    for (auto c : paths)
+    {
+        index_page.add_link("./" + c, c);
+    }
+    std::cout << index_page.get_page();
+    index_public << index_page.get_page();
+    index_public.close();
     check(public_folder.create_directory("./public"), "create public folder");
     check(test_folder.create_directory("./test_input"), "create test folder");
     // Creating socket file descriptor
@@ -63,6 +78,7 @@ int main(int argc, char const *argv[])
           "Bind_failed");
 
     check(listen(server_fd, SERVER_BACKLOG), "Listen_failed");
+
     while (true)
     {
         check((new_socket = accept(server_fd, (struct sockaddr *)&address,

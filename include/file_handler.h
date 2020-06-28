@@ -46,7 +46,8 @@ namespace file_handler
     private:
         static int parser(const char *fpath, const struct stat *sb, int typeflag);
         static std::unordered_map<std::string, std::string> _file_list;
-        std::vector<std::string> file_list;
+        std::unordered_map<std::string, std::string> file_list;
+        std::vector<std::string> file_names;
         std::vector<std::string> file_paths;
         int a;
     };

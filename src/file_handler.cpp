@@ -8,6 +8,8 @@ int file_handler::file::create_directory(std::string root_folder)
     if (stat(root_folder.c_str(), &sb) == -1)
         return -1;
     ftw(root_folder.c_str(), parser, 16);
+    file_handler::file::file_list = _file_list;
+    _file_list.clear();
     return 0;
 }
 
@@ -19,6 +21,8 @@ file_handler::file::file(std::string root_folder)
         exit(EXIT_FAILURE);
     }
     ftw(root_folder.c_str(), parser, 16);
+    file_handler::file::file_list = _file_list;
+    _file_list.clear();
 }
 
 int file_handler::file::parser(const char *fpath, const struct stat *sb, int typeflag)
@@ -34,22 +38,22 @@ int file_handler::file::parser(const char *fpath, const struct stat *sb, int typ
 
 std::vector<std::string> file_handler::file::get_filelist()
 {
-    if (file_handler::file::file_list.empty())
+    if (file_handler::file::file_names.empty())
     {
-        for (auto kv : file_handler::file::_file_list)
+        for (auto kv : file_handler::file::file_list)
         {
-            file_handler::file::file_list.push_back(kv.first);
+            file_handler::file::file_names.push_back(kv.first);
         }
     }
 
-    return file_handler::file::file_list;
+    return file_handler::file::file_names;
 }
 
 std::vector<std::string> file_handler::file::get_paths()
 {
     if (file_handler::file::file_paths.empty())
     {
-        for (auto kv : file_handler::file::_file_list)
+        for (auto kv : file_handler::file::file_list)
         {
             file_handler::file::file_paths.push_back(kv.second);
         }
@@ -60,10 +64,10 @@ std::vector<std::string> file_handler::file::get_paths()
 
 std::string file_handler::file::get_file(std::string filename)
 {
-    if (file_handler::file::_file_list.find(filename) == file_handler::file::_file_list.end())
+    if (file_handler::file::file_list.find(filename) == file_handler::file::_file_list.end())
     {
         fprintf(stderr, "File : %s Not found", filename.c_str());
         return "";
     }
-    return file_handler::file::_file_list[filename];
+    return file_handler::file::file_list[filename];
 }
