@@ -60,3 +60,21 @@ serve_static::servestatic::servestatic(std::string folder)
 servestatic server("./public");
 server.serve("/index.html",sock_fd);
 ```
+### Handle connection
+### Methods
+```
+ void use(void *object, int (*func)(void *context, std::string response, int new_socket))
+int call(std::string response, int new_socket)
+```
+Use function works similar to express.js use method 
+### example
+```
+ handle_connection::handleconnection routes;
+    routes.use(&public_folder, serve_static::servestatic::serve);
+    routes.use(&test_folder, serve_static::servestatic::serve);
+```
+Handle Connection has a middleware stack
+```
+std::vector<std::pair<void *, int (*)(void *, std::string, int)>> funclist;
+```
+Middleware can be added using use function The call function execute all the function in middleware stack in sequential order of their addition
