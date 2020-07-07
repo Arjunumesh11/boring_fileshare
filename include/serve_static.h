@@ -35,6 +35,12 @@ namespace serve_static
         //@param : socket
         //@return : -1 if not successfull else 0
         int serve(std::string path, int new_socket);
+
+        //static wrapper for serve function
+        //@param : object reference
+        //@param : file path
+        //@param : sock_fd
+        static int serve(void *context, std::string req, int new_socket);
     };
 
 } // namespace serve_static

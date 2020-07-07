@@ -10,7 +10,7 @@ int html_template::html_page::init_page(std::string title)
          << "<meta charset = \" UTF - 8 \">\n"
          << "<meta name = \" viewport \" content = \" width = device - width, initial -scale = 1.0 \">\n"
          << "<title>" << title << "</title>\n"
-         << "<script src = \"./ script.js \"> </script>\n"
+         << "<script src = \"./script.js \"> </script>\n"
          << "</head>\n"
          << "<body>\n"
          << "<ul>\n";

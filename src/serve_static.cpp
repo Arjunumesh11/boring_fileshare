@@ -37,3 +37,8 @@ int serve_static::servestatic::serve(std::string path, int new_socket)
     close(new_socket);
     return 0;
 }
+
+int serve_static::servestatic::serve(void *context, std::string req, int new_socket)
+{
+    return static_cast<serve_static::servestatic *>(context)->serve(req, new_socket);
+}

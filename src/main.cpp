@@ -78,7 +78,9 @@ int main(int argc, char const *argv[])
           "Bind_failed");
 
     check(listen(server_fd, SERVER_BACKLOG), "Listen_failed");
-
+    handle_connection::handleconnection routes;
+    routes.use(&public_folder, serve_static::servestatic::serve);
+    routes.use(&test_folder, serve_static::servestatic::serve);
     while (true)
     {
         check((new_socket = accept(server_fd, (struct sockaddr *)&address,
@@ -87,22 +89,7 @@ int main(int argc, char const *argv[])
               "accept_failed");
         read(new_socket, buffer_recv, 1024);
         request = buffer_recv;
-        fprintf(stderr, "%s", request.c_str());
-        T = std::thread([&server, &public_folder, &test_folder](std::string request, int new_socket) {
-            server.parse(request);
-            if (public_folder.serve(server.getpath(), new_socket) < 0)
-                if (test_folder.serve(server.getpath(), new_socket) < 0)
-                {
-                    close(new_socket);
-                    return -1;
-                }
-            close(new_socket);
-            return 0;
-        },
-                        request, new_socket);
-        // read(new_socket, buffer_recv, 1024);
-        // std::cout << server.getpath();
-        // T = std::thread(send_video, new_socket);
+        T = std::thread([&routes, &server](std::string request, int new_socket) {server.parse(request); routes.call(server.getpath(), new_socket); }, request, new_socket);
         T.detach();
     }
     return 0;

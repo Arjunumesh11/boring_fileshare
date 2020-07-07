@@ -4,6 +4,7 @@
 #include <string>
 #include <utility>
 #include <vector>
+#include <unistd.h>
 #include <errno.h>
 #include <functional>
 
@@ -15,7 +16,7 @@ namespace handle_connection
 
     public:
         //adds function to the list of function to excecute
-        //@param reference of the object
+        //@param : reference of the object
         //@param : int (*func)(void* ,std::string,int) function
         void use(void *object, int (*func)(void *context, std::string response, int new_socket))
         {
@@ -33,8 +34,11 @@ namespace handle_connection
             {
                 //need to extract the type of the reference object T
                 if (c.second(c.first, response, new_socket) == 0) //code is incomplete
+                {
                     return 0;
+                }
             }
+            close(new_socket);
             return -1;
         }
     };
