@@ -1,4 +1,4 @@
-# Boring_fileshare
+# Offline streamer
 A simple video streaming service implemented from scratch using c++
 
 ## HTTP
