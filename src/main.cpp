@@ -20,11 +20,12 @@
 #define SERVER_BACKLOG 10
 #define THREAD_POOL_SIZE 10
 
-void check(int status, std::string error) //function to check error
+using namespace std;
+void check(int status, string error) //function to check error
 {
     if (status == -1)
     {
-        fprintf(stderr, "%s : %s\n", error.c_str(), std::strerror(errno));
+        fprintf(stderr, "%s : %s\n", error.c_str(), strerror(errno));
         exit(EXIT_FAILURE);
     }
 }
@@ -32,12 +33,12 @@ void check(int status, std::string error) //function to check error
 int main(int argc, char const *argv[])
 {
     int server_fd, new_socket;
-    std::string request;
+    string request;
     struct sockaddr_in address;
     int addrlen = sizeof(address);
     int opt = 1;
     char buffer_recv[BUFFER_SIZE] = {0};
-    std::thread T;
+    thread T;
 
     html_template::html_page index_page;
     http_parser::http server;
@@ -45,17 +46,17 @@ int main(int argc, char const *argv[])
     serve_static::servestatic public_folder;
     serve_static::servestatic test_folder;
     file_handler::file video_folder("./test_input");
-    std::vector<std::string> path = video_folder.get_paths();
+    vector<string> path = video_folder.get_paths();
 
-    std::ofstream index_public("./public/index.html");
+    ofstream index_public("./public/index.html");
 
-    std::vector<std::string> paths = video_folder.get_filelist();
+    vector<string> paths = video_folder.get_filelist();
     index_page.init_page();
     for (auto c : paths)
     {
         index_page.add_link("./" + c, c);
     }
-    std::cout << index_page.get_page();
+    cout << index_page.get_page();
     index_public << index_page.get_page();
     index_public.close();
     check(public_folder.create_directory("./public"), "create public folder");
@@ -89,7 +90,7 @@ int main(int argc, char const *argv[])
               "accept_failed");
         read(new_socket, buffer_recv, 1024);
         request = buffer_recv;
-        T = std::thread([&routes, &server](std::string request, int new_socket) {server.parse(request); routes.call(server.getpath(), new_socket); }, request, new_socket);
+        T = thread([&routes, &server](string request, int new_socket) {server.parse(request); routes.call(server.getpath(), new_socket); }, request, new_socket);
         T.detach();
     }
     return 0;
