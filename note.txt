@@ -24,6 +24,6 @@ httprequest handler
 	}
 serving static page
     {
-        if index.hmtl or / server index.html
+        if index.html or / server index.html
         serve all files in the folder
     }
